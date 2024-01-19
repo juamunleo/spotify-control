@@ -1,0 +1,8 @@
+version: "2.1"
+services:
+  code-server:
+    image: 192.168.100.228:90/c_devcontainer:1.0.0
+    container_name: spotify_api_c_devcontainer
+    volumes:
+      - ./:/work
+    restart: unless-stopped

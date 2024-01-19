@@ -1,0 +1,12 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build debug program",
+            "type": "shell",
+            "command": "docker exec -i spotify_api_c_devcontainer gcc -g src/main.c -o dist/program",
+            "problemMatcher": ["$gcc"],
+            "group": "build"
+        },
+    ]
+}
