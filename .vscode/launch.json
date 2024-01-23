@@ -8,7 +8,7 @@
             "name": "(gdb) Docker",
             "type": "cppdbg",
             "request": "launch",
-            "program": "/work/build/SpotifyApi",
+            "program": "/work/build/main/program",
             "args": [],
             "stopAtEntry": true,
             "cwd": "/work",
