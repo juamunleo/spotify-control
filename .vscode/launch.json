@@ -8,13 +8,13 @@
             "name": "(gdb) Docker",
             "type": "cppdbg",
             "request": "launch",
-            "program": "/work/dist/program",
+            "program": "/work/build/SpotifyApi",
             "args": [],
             "stopAtEntry": true,
             "cwd": "/work",
             "environment": [],
             "externalConsole": true,
-            "preLaunchTask": "build debug program",
+            "preLaunchTask": "Build CMake project for debug",
             "targetArchitecture": "x64",
             "sourceFileMap": {
                 "/work": "${workspaceFolder}"
