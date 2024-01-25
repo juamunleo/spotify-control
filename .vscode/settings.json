@@ -4,7 +4,11 @@
         "stdio.h": "c",
         "io.h": "c",
         "stdint.h": "c",
-        "player.h": "c"
+        "player.h": "c",
+        "netdb.h": "c",
+        "socket.h": "c",
+        "curl.h": "c",
+        "api.h": "c"
     },
     "cmake.configureOnOpen": false
 }

@@ -22,6 +22,7 @@ extern IO_Pin_t g_io_volUpButton;
 extern IO_Pin_t g_io_volDownButton;
 extern IO_Pin_t g_io_randomButton;
 
+void io_init(void);
 bool io_isInterrupted(void);
 IO_PinState_t io_getPinState(IO_Pin_t * pin);
 void io_setPinState(IO_Pin_t * pin, IO_PinState_t state);

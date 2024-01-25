@@ -48,7 +48,7 @@ static void io_processInput(char * commandString) {
     else if(strcmp(commandString, g_stopRandomString) == 0) io_setPinState(&g_io_randomButton, true);
 }
 
-void io_init() {
+void io_init(void) {
     printf("Commands:\n");
     printf("    * %s\n", g_stopCommandString);
     printf("    * %s\n", g_stopPlayString);
