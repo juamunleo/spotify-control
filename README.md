@@ -6,4 +6,4 @@ Execute: `docker compose up -d`
 
 
 ### Connect to the container
-Using vscode remote containers or going to http://localhost (can't debug on web).
+Using vscode remote containers or going to http://localhost (can't debug on web. password is 'password').
