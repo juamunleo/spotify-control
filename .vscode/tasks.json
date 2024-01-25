@@ -4,18 +4,18 @@
         {
             "label": "Clean CMake project",
             "type": "shell",
-            "command": "docker exec -i spotify_api_c_devcontainer rm -rf ./build",
+            "command": "rm -rf ./build",
         },
         {
             "label": "Configure CMake project for debug",
             "type": "shell",
-            "command": "docker exec -i spotify_api_c_devcontainer cmake -S . -B ./build -DCMAKE_BUILD_TYPE=Debug",
+            "command": "cmake -S . -B ./build -DCMAKE_BUILD_TYPE=Debug",
             "dependsOn": "Clean CMake project"
         },
         {
             "label": "Build CMake project for debug",
             "type": "shell",
-            "command": "docker exec -i spotify_api_c_devcontainer cmake --build ./build",
+            "command": "cmake --build ./build",
             "group": "build",
             "dependsOn": "Configure CMake project for debug"
         },

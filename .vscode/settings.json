@@ -1,0 +1,10 @@
+{
+    "files.associations": {
+        "application.h": "c",
+        "stdio.h": "c",
+        "io.h": "c",
+        "stdint.h": "c",
+        "player.h": "c"
+    },
+    "cmake.configureOnOpen": false
+}
