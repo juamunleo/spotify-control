@@ -1,15 +1,38 @@
 
+#include <stdio.h>
 #include <curl/curl.h>
 #include "api.h"
+
+#ifndef CLIENT_ID
+#define CLIENT_ID ""
+#endif
+
+#ifndef CLIENT_SECRET
+#define CLIENT_SECRET ""
+#endif
 
 static CURL * g_curl;
 
 void api_init(void) {
+    struct curl_slist *list = NULL;
+    curl_off_t size;
     g_curl = curl_easy_init();
+    char url[159];
+    snprintf(url, sizeof(url), "https://accounts.spotify.com/api/token?grant_type=client_credentials&client_id=%s&client_secret=%s", CLIENT_ID, CLIENT_SECRET);
+    curl_easy_setopt(g_curl, CURLOPT_POST, 1L);    
+    curl_easy_setopt(g_curl, CURLOPT_URL, url);
+    curl_easy_setopt(g_curl, CURLOPT_POSTFIELDSIZE, 0L);
+    curl_easy_setopt(g_curl, CURLOPT_POSTFIELDS, "");    
+    list = curl_slist_append(list, "Content-Type: application/x-www-form-urlencoded");
+    curl_easy_setopt(g_curl, CURLOPT_HTTPHEADER, list);
+    curl_easy_perform(g_curl);
+    curl_easy_getinfo(g_curl, CURLINFO_SIZE_DOWNLOAD_T, &size);
+    printf("Size: %ld", size);
+    curl_slist_free_all(list);
 }
 
 static void api_sendRequest(void /* data */) {
-
+    
 }
 
 static void api_sendStopRequest(void) {

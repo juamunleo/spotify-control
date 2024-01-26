@@ -2,10 +2,12 @@
 #include "application.h"
 #include "io.h"
 #include "player.h"
+#include "api.h"
 
 void app_setup(void) {
     io_init();
     player_init();
+    api_init();
 }
 
 void app_loop(void) {

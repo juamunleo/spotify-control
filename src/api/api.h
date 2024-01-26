@@ -11,4 +11,6 @@ typedef enum {
     Request_Random
 } Request_t;
 
+void api_init(void);
+
 #endif
