@@ -8,7 +8,9 @@
         "netdb.h": "c",
         "socket.h": "c",
         "curl.h": "c",
-        "api.h": "c"
+        "api.h": "c",
+        "cstdlib": "c",
+        "type_traits": "c"
     },
     "cmake.configureOnOpen": false
 }

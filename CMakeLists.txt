@@ -29,6 +29,7 @@ add_executable(
     src/io/io.c
     src/player/player.c
     src/api/api.c
+    src/json/parson.c
 )
 
 target_include_directories(
@@ -38,6 +39,7 @@ target_include_directories(
     src/io
     src/player
     src/api
+    src/json
     ${CURL_INCLUDE_DIR}
 )
 

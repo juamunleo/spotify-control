@@ -1,6 +1,9 @@
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <curl/curl.h>
+#include "parson.h"
 #include "api.h"
 
 #ifndef CLIENT_ID
@@ -11,36 +14,129 @@
 #define CLIENT_SECRET ""
 #endif
 
-static CURL * g_curl;
+typedef struct {
+    char * content;
+    size_t len;
+} RequestResponse_t;
 
-void api_init(void) {
-    struct curl_slist *list = NULL;
-    curl_off_t size;
-    g_curl = curl_easy_init();
-    char url[159];
-    snprintf(url, sizeof(url), "https://accounts.spotify.com/api/token?grant_type=client_credentials&client_id=%s&client_secret=%s", CLIENT_ID, CLIENT_SECRET);
-    curl_easy_setopt(g_curl, CURLOPT_POST, 1L);    
-    curl_easy_setopt(g_curl, CURLOPT_URL, url);
-    curl_easy_setopt(g_curl, CURLOPT_POSTFIELDSIZE, 0L);
-    curl_easy_setopt(g_curl, CURLOPT_POSTFIELDS, "");    
-    list = curl_slist_append(list, "Content-Type: application/x-www-form-urlencoded");
-    curl_easy_setopt(g_curl, CURLOPT_HTTPHEADER, list);
-    curl_easy_perform(g_curl);
-    curl_easy_getinfo(g_curl, CURLINFO_SIZE_DOWNLOAD_T, &size);
-    printf("Size: %ld", size);
-    curl_slist_free_all(list);
+static char * token;
+
+static void api_initRequestResponse(RequestResponse_t * response) {
+    response->len = 0;
+    response->content = malloc(1);
+    if(response->content == NULL) {
+        printf("Error initializating RequestResponse_t\n");
+        exit(1);
+    }
+    response->content[0] = '\0';
 }
 
-static void api_sendRequest(void /* data */) {
+static void api_freeRequestResponse(RequestResponse_t * response) {
+    free(response->content);
+}
+
+static size_t api_callback_readContent(void * incomingContent, size_t size, size_t nmemb, RequestResponse_t * response){
+    // Calculate new size of the response content (current+new)    
+    size_t newLen = response->len + size*nmemb;
+
+    // Reallocate response->content in memory to contain the new data
+    response->content = realloc(response->content, newLen+1);
+    if(response->content == NULL) {
+        printf("Error reallocating RequestResponse_t\n");
+        exit(1);
+    }
+    // Append new content in the response->content string.
+    memcpy(&response->content[response->len], incomingContent, size*nmemb);
+    response->content[newLen] = '\0';
+    response->len = newLen;
+    return size*nmemb;
+}
+
+static char * api_getNewToken(void) {
+    // Variable declaration
+    char url[200];
+    RequestResponse_t response;
+    curl_off_t size;
+    JSON_Value * jsonValue;
+    JSON_Object * jsonObject;
+    const char * receivedToken;
+    size_t receivedTokenSize;
+    struct curl_slist *list = NULL;
+    char * newToken = NULL;
+
+    // Initialization
+    CURL* curl = curl_easy_init();
+    api_initRequestResponse(&response);
+
+    // HTTP Request using cURL
+    snprintf(url, sizeof(url), "https://accounts.spotify.com/api/token?grant_type=client_credentials&client_id=%s&client_secret=%s", CLIENT_ID, CLIENT_SECRET);
+    curl_easy_setopt(curl, CURLOPT_POST, 1L);
+    curl_easy_setopt(curl, CURLOPT_URL, url);
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, 0L);
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, "");
+    list = curl_slist_append(list, "Accept: application/json");
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, list);
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, api_callback_readContent);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
+    curl_easy_perform(curl);
+
+    // Parse HTTP response using JSON
+    jsonValue = json_parse_string(response.content);
+    jsonObject = json_value_get_object(jsonValue);
+    receivedToken = json_object_get_string(jsonObject, "access_token");
     
+    // Store the received token in the variable that will be returned
+    if(receivedToken != NULL) {
+        receivedTokenSize = strlen(receivedToken);
+        newToken = malloc(receivedTokenSize+1);
+        strcpy(newToken, receivedToken);
+    }
+
+    // Cleanup
+    json_value_free(jsonValue);
+    api_freeRequestResponse(&response);
+    curl_slist_free_all(list);
+    curl_easy_cleanup(curl);
+
+    return newToken;
+}
+
+static void renewToken() {
+    free(token);
+    token = api_getNewToken();
+    if(token == NULL) {
+        printf("Error getting token\n");
+    }
+}
+
+void api_init(void) {
+    renewToken();
+    printf("New token: %s\n", token);
+}
+
+static void api_sendRequest(char * url) {
+    CURL* curl = curl_easy_init();
+    struct curl_slist *list = NULL;
+    char authHeader[200];
+    curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PUT");
+    curl_easy_setopt(curl, CURLOPT_URL, url);
+    curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, 0L);
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, "");
+    snprintf(authHeader, sizeof(authHeader), "Authorization: Bearer %s", token);
+    list = curl_slist_append(list, authHeader);
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, list);
+    curl_easy_perform(curl);
+    curl_slist_free_all(list);
+    curl_easy_cleanup(curl);
 }
 
 static void api_sendStopRequest(void) {
-    
+    api_sendRequest("https://api.spotify.com/v1/me/player/pause");
 }
 
 static void api_sendPlayRequest(void) {
-    
+    api_sendRequest("https://api.spotify.com/v1/me/player/play");
 }
 
 static void api_sendNextRequest(void) {

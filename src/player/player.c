@@ -1,6 +1,7 @@
 
 #include <stdio.h>
 #include "player.h"
+#include "api.h"
 
 static PlayerState_t g_playerState;
 
@@ -23,11 +24,11 @@ uint8_t player_volume(void) {
 }
 
 static void player_command_stop(void) {
-    printf("Command executed: stop\n");
+    api_makeRequest(Request_Stop);
 }
 
 static void player_command_play(void) {
-    printf("Command executed: play\n");
+    api_makeRequest(Request_Play);
 }
 
 static void player_command_next(void) {
