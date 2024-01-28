@@ -12,9 +12,6 @@ with open(envFile, "r") as file:
     client_id = file.readline().strip()
     client_secret = file.readline().strip()
 
-print('client_id:'+client_id)
-print('client_secret:'+client_secret)
-
 @app.route('/', methods=['GET'])
 def root():
     return app.redirect("https://accounts.spotify.com/authorize?"+
@@ -39,8 +36,8 @@ def callback():
             'code':code
         }
         returnedResponse = requests.post('https://accounts.spotify.com/api/token', data=forms, headers=headers)
-        if(returnedResponse.json()['access_token'] is not None):
-            return returnedResponse.json()['access_token']
+        if(returnedResponse.json()['refresh_token'] is not None):
+            return 'Refresh token: ' + returnedResponse.json()['refresh_token']
         return returnedResponse.content
     return 'Error'
 
