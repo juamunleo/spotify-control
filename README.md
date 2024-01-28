@@ -9,5 +9,5 @@ Execute: `docker compose up -d`
 Using vscode remote containers
 
 
-### Configure the project
+### Configure the project
 Read .env.template to create your own .env file in order to build the application.
