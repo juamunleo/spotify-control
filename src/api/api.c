@@ -6,18 +6,36 @@
 #include "parson.h"
 #include "api.h"
 
+// URLs
+//#define API_URL_TOKEN "https://accounts.spotify.com/api/token?grant_type=client_credentials&client_id=%s&client_secret=%s"
+#define API_URL_TOKEN "https://accounts.spotify.com/api/token?grant_type=refresh_token&refresh_token=%s&client_id=%s"
+#define API_URL_PAUSE "https://api.spotify.com/v1/me/player/pause"
+#define API_URL_PLAY "https://api.spotify.com/v1/me/player/play"
+#define API_URL_NEXT "https://api.spotify.com/v1/me/player/next"
+#define API_URL_PREV "https://api.spotify.com/v1/me/player/previous"
+#define API_URL_VOL "https://api.spotify.com/v1/me/player/volume?volume_percent=%d"
+#define API_URL_RANDOM "https://api.spotify.com/v1/me/player/shuffle?state=%s"
+
+// JSON Keys
+#define JSON_KEY_TOKEN "access_token"
+
 #ifndef CLIENT_ID
 #define CLIENT_ID ""
 #endif
 
-#ifndef CLIENT_SECRET
-#define CLIENT_SECRET ""
+#ifndef REFRESH_TOKEN
+#define REFRESH_TOKEN ""
 #endif
 
 typedef struct {
     char * content;
     size_t len;
 } RequestResponse_t;
+
+typedef enum {
+    HTTPRequestType_PUT,
+    HTTPRequestType_POST
+} HTTPRequestType_t;
 
 static char * token;
 
@@ -69,7 +87,7 @@ static char * api_getNewToken(void) {
     api_initRequestResponse(&response);
 
     // HTTP Request using cURL
-    snprintf(url, sizeof(url), "https://accounts.spotify.com/api/token?grant_type=client_credentials&client_id=%s&client_secret=%s", CLIENT_ID, CLIENT_SECRET);
+    snprintf(url, sizeof(url), API_URL_TOKEN, CLIENT_ID, REFRESH_TOKEN);
     curl_easy_setopt(curl, CURLOPT_POST, 1L);
     curl_easy_setopt(curl, CURLOPT_URL, url);
     curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, 0L);
@@ -83,7 +101,7 @@ static char * api_getNewToken(void) {
     // Parse HTTP response using JSON
     jsonValue = json_parse_string(response.content);
     jsonObject = json_value_get_object(jsonValue);
-    receivedToken = json_object_get_string(jsonObject, "access_token");
+    receivedToken = json_object_get_string(jsonObject, JSON_KEY_TOKEN);
     
     // Store the received token in the variable that will be returned
     if(receivedToken != NULL) {
@@ -114,13 +132,14 @@ void api_init(void) {
     printf("New token: %s\n", token);
 }
 
-static void api_sendRequest(char * url) {
+static void api_sendRequest(char * url, HTTPRequestType_t type) {
     CURL* curl = curl_easy_init();
     struct curl_slist *list = NULL;
-    char authHeader[200];
-    curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PUT");
+    char authHeader[210];
+    if(type == HTTPRequestType_PUT) curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PUT");
+    else if(type == HTTPRequestType_PUT) curl_easy_setopt(curl, CURLOPT_POST, 1L);
     curl_easy_setopt(curl, CURLOPT_URL, url);
-    curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
+    //curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
     curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, 0L);
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, "");
     snprintf(authHeader, sizeof(authHeader), "Authorization: Bearer %s", token);
@@ -132,62 +151,63 @@ static void api_sendRequest(char * url) {
 }
 
 static void api_sendStopRequest(void) {
-    api_sendRequest("https://api.spotify.com/v1/me/player/pause");
+    api_sendRequest(API_URL_PAUSE, HTTPRequestType_PUT);
 }
 
 static void api_sendPlayRequest(void) {
-    api_sendRequest("https://api.spotify.com/v1/me/player/play");
+    api_sendRequest(API_URL_PLAY, HTTPRequestType_PUT);
 }
 
 static void api_sendNextRequest(void) {
-    
+    api_sendRequest(API_URL_NEXT, HTTPRequestType_POST);
 }
 
 static void api_sendPrevRequest(void) {
-    
+    api_sendRequest(API_URL_PREV, HTTPRequestType_POST);
 }
 
-static void api_sendVolUpRequest(void) {
-    
+static void api_sendVolRequest(uint8_t volumePercent) {
+    char url[63];
+    snprintf(url, sizeof(url), API_URL_VOL, volumePercent);
+    api_sendRequest(url, HTTPRequestType_PUT);
 }
 
-static void api_sendVolDownRequest(void) {
-    
+static void api_sendRandomRequest(bool randomEnabled) {
+    char url[57];
+    snprintf(url, sizeof(url), API_URL_RANDOM, randomEnabled ? "true" : "false");
+    api_sendRequest(url, HTTPRequestType_PUT);
 }
 
-static void api_sendRandomRequest(void) {
-    
+void api_initRequest(ApiRequest_t * request) {
+    request->type = RequestType_Undefined;
+    request->volumePercent = 0;
+    request->randomEnabled = false;
 }
 
-
-void api_makeRequest(Request_t request) {
-    switch(request) {
-        case Request_Stop:
+void api_makeRequest(ApiRequest_t * request) {
+    switch(request->type) {
+        case RequestType_Stop:
             api_sendStopRequest();
             break;
 
-        case Request_Play:
+        case RequestType_Play:
             api_sendPlayRequest();
             break;
 
-        case Request_Next:
+        case RequestType_Next:
             api_sendNextRequest();
             break;
 
-        case Request_Prev:
+        case RequestType_Prev:
             api_sendPrevRequest();
             break;
 
-        case Request_VolUp:
-            api_sendVolUpRequest();
+        case RequestType_Vol:
+            api_sendVolRequest(request->volumePercent);
             break;
 
-        case Request_VolDown:
-            api_sendVolDownRequest();
-            break;
-            
-        case Request_Random:
-            api_sendRandomRequest();
+        case RequestType_Random:
+            api_sendRandomRequest(request->randomEnabled);
             break;
 
         default:

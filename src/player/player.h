@@ -5,8 +5,8 @@
 #include <stdbool.h>
 
 typedef struct {
-    uint8_t vol;
     bool playing;
+    uint8_t volumePercent;
     bool randomEnabled;
 } PlayerState_t;
 

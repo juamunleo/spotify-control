@@ -10,7 +10,8 @@
         "curl.h": "c",
         "api.h": "c",
         "cstdlib": "c",
-        "type_traits": "c"
+        "type_traits": "c",
+        "stdbool.h": "c"
     },
     "cmake.configureOnOpen": false
 }

@@ -14,12 +14,15 @@ if(READ_ENV_FILE)
 
     list(GET ENV_FILE 0 CLIENT_ID)
     list(GET ENV_FILE 1 CLIENT_SECRET)
+    list(GET ENV_FILE 2 ACCESS_TOKEN)
 
     add_definitions(-DCLIENT_ID="${CLIENT_ID}")
     add_definitions(-DCLIENT_SECRET="${CLIENT_SECRET}")
+    add_definitions(-DACCESS_TOKEN="${ACCESS_TOKEN}")
 
     message(STATUS "CLIENT_ID=${CLIENT_ID}")
     message(STATUS "CLIENT_SECRET=${CLIENT_SECRET}")
+    message(STATUS "ACCESS_TOKEN=${ACCESS_TOKEN}")
 endif()
 
 add_executable(
