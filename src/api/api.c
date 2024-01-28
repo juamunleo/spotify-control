@@ -7,8 +7,7 @@
 #include "api.h"
 
 // URLs
-//#define API_URL_TOKEN "https://accounts.spotify.com/api/token?grant_type=client_credentials&client_id=%s&client_secret=%s"
-#define API_URL_TOKEN "https://accounts.spotify.com/api/token?grant_type=refresh_token&refresh_token=%s&client_id=%s"
+#define API_URL_TOKEN "https://accounts.spotify.com/api/token"
 #define API_URL_PAUSE "https://api.spotify.com/v1/me/player/pause"
 #define API_URL_PLAY "https://api.spotify.com/v1/me/player/play"
 #define API_URL_NEXT "https://api.spotify.com/v1/me/player/next"
@@ -16,11 +15,8 @@
 #define API_URL_VOL "https://api.spotify.com/v1/me/player/volume?volume_percent=%d"
 #define API_URL_RANDOM "https://api.spotify.com/v1/me/player/shuffle?state=%s"
 
-// JSON Keys
-#define JSON_KEY_TOKEN "access_token"
-
-#ifndef CLIENT_ID
-#define CLIENT_ID ""
+#ifndef BASIC_AUTHORIZATION_BASE64
+#define BASIC_AUTHORIZATION_BASE64 ""
 #endif
 
 #ifndef REFRESH_TOKEN
@@ -37,7 +33,8 @@ typedef enum {
     HTTPRequestType_POST
 } HTTPRequestType_t;
 
-static char * token;
+static char * accessToken;
+static char * refreshToken;
 
 static void api_initRequestResponse(RequestResponse_t * response) {
     response->len = 0;
@@ -72,42 +69,46 @@ static size_t api_callback_readContent(void * incomingContent, size_t size, size
 
 static char * api_getNewToken(void) {
     // Variable declaration
-    char url[200];
+    char bodyContent[313];
+    char authorization[110];
     RequestResponse_t response;
     curl_off_t size;
     JSON_Value * jsonValue;
     JSON_Object * jsonObject;
-    const char * receivedToken;
-    size_t receivedTokenSize;
+    const char * receivedAccessToken;
+    size_t receivedAccessTokenSize;
     struct curl_slist *list = NULL;
-    char * newToken = NULL;
+    char * newAccessToken;
 
     // Initialization
     CURL* curl = curl_easy_init();
     api_initRequestResponse(&response);
 
     // HTTP Request using cURL
-    snprintf(url, sizeof(url), API_URL_TOKEN, CLIENT_ID, REFRESH_TOKEN);
+    snprintf(bodyContent, sizeof(bodyContent), "grant_type=refresh_token&refresh_token=%s", REFRESH_TOKEN);
+    snprintf(authorization, sizeof(authorization), "Authorization: Basic %s", BASIC_AUTHORIZATION_BASE64);
     curl_easy_setopt(curl, CURLOPT_POST, 1L);
-    curl_easy_setopt(curl, CURLOPT_URL, url);
-    curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, 0L);
-    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, "");
+    curl_easy_setopt(curl, CURLOPT_URL, API_URL_TOKEN);
+    //curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, strlen(bodyContent)+1);
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, bodyContent);
     list = curl_slist_append(list, "Accept: application/json");
+    list = curl_slist_append(list, authorization);
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, list);
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, api_callback_readContent);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
+    //curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L); // Uncomment if request debug is needed
     curl_easy_perform(curl);
 
-    // Parse HTTP response using JSON
+    // Parse HTTP response using JSONc
     jsonValue = json_parse_string(response.content);
     jsonObject = json_value_get_object(jsonValue);
-    receivedToken = json_object_get_string(jsonObject, JSON_KEY_TOKEN);
-    
+    receivedAccessToken = json_object_get_string(jsonObject, "access_token");
+
     // Store the received token in the variable that will be returned
-    if(receivedToken != NULL) {
-        receivedTokenSize = strlen(receivedToken);
-        newToken = malloc(receivedTokenSize+1);
-        strcpy(newToken, receivedToken);
+    if(receivedAccessToken != NULL) {
+        receivedAccessTokenSize = strlen(receivedAccessToken);
+        newAccessToken = malloc(receivedAccessTokenSize+1);
+        strcpy(newAccessToken, receivedAccessToken);
     }
 
     // Cleanup
@@ -116,36 +117,43 @@ static char * api_getNewToken(void) {
     curl_slist_free_all(list);
     curl_easy_cleanup(curl);
 
-    return newToken;
+    return newAccessToken;
 }
 
 static void renewToken() {
-    free(token);
-    token = api_getNewToken();
-    if(token == NULL) {
-        printf("Error getting token\n");
+    free(accessToken);
+    free(refreshToken);
+    accessToken = api_getNewToken();
+    if(accessToken == NULL) {
+        printf("Error getting new access token\n");
     }
 }
 
 void api_init(void) {
     renewToken();
-    printf("New token: %s\n", token);
 }
 
 static void api_sendRequest(char * url, HTTPRequestType_t type) {
+    // Variable declaration
+    char authHeader[210];
+
+    // Initialization
     CURL* curl = curl_easy_init();
     struct curl_slist *list = NULL;
-    char authHeader[210];
+
+    // HTTP Request using cURL
     if(type == HTTPRequestType_PUT) curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PUT");
     else if(type == HTTPRequestType_PUT) curl_easy_setopt(curl, CURLOPT_POST, 1L);
     curl_easy_setopt(curl, CURLOPT_URL, url);
-    //curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
     curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, 0L);
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, "");
-    snprintf(authHeader, sizeof(authHeader), "Authorization: Bearer %s", token);
+    snprintf(authHeader, sizeof(authHeader), "Authorization: Bearer %s", accessToken);
     list = curl_slist_append(list, authHeader);
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, list);
+    //curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L); // Uncomment if request debug is needed
     curl_easy_perform(curl);
+
+    // Cleanup
     curl_slist_free_all(list);
     curl_easy_cleanup(curl);
 }

@@ -11,18 +11,16 @@ message(STATUS ${CURL_INCLUDE_DIR}/curl)
 
 if(READ_ENV_FILE)
     file(STRINGS .env ENV_FILE)
+    
+    # Lines 0 and 1 of the .env file are ignored. They are not useful in the build process.
+    list(GET ENV_FILE 2 BASIC_AUTHORIZATION_BASE64)
+    list(GET ENV_FILE 3 REFRESH_TOKEN)
 
-    list(GET ENV_FILE 0 CLIENT_ID)
-    list(GET ENV_FILE 1 CLIENT_SECRET)
-    list(GET ENV_FILE 2 ACCESS_TOKEN)
+    add_definitions(-DBASIC_AUTHORIZATION_BASE64="${BASIC_AUTHORIZATION_BASE64}")
+    add_definitions(-DREFRESH_TOKEN="${REFRESH_TOKEN}")
 
-    add_definitions(-DCLIENT_ID="${CLIENT_ID}")
-    add_definitions(-DCLIENT_SECRET="${CLIENT_SECRET}")
-    add_definitions(-DACCESS_TOKEN="${ACCESS_TOKEN}")
-
-    message(STATUS "CLIENT_ID=${CLIENT_ID}")
-    message(STATUS "CLIENT_SECRET=${CLIENT_SECRET}")
-    message(STATUS "ACCESS_TOKEN=${ACCESS_TOKEN}")
+    message(STATUS "BASIC_AUTHORIZATION_BASE64=${BASIC_AUTHORIZATION_BASE64}")
+    message(STATUS "REFRESH_TOKEN=${REFRESH_TOKEN}")
 endif()
 
 add_executable(
