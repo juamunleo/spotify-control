@@ -5,7 +5,7 @@
 #include <stdbool.h>
 
 typedef enum {
-    RequestType_Stop,
+    RequestType_Pause,
     RequestType_Play,
     RequestType_Next,
     RequestType_Prev,

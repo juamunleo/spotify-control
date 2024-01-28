@@ -11,7 +11,7 @@ typedef struct {
 } PlayerState_t;
 
 typedef enum {
-    Command_Stop,
+    Command_Pause,
     Command_Play,
     Command_Next,
     Command_Prev,
