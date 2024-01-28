@@ -44,8 +44,4 @@ def callback():
         return returnedResponse.content
     return 'Error'
 
-@app.route('/logged', methods=['GET'])
-def logged():
-    return 'logged'
-
 app.run(host="0.0.0.0", port=3000, debug=False)
