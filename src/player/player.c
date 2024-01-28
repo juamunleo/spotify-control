@@ -40,9 +40,9 @@ void player_updateRandomEnabled(bool enabled) {
     g_playerState.randomEnabled = enabled;
 }
 
-static void player_command_stop(void) {
+static void player_command_pause(void) {
     ApiRequest_t request = {
-        .type = RequestType_Stop
+        .type = RequestType_Pause
     };
     api_makeRequest(&request);
 }
@@ -98,8 +98,8 @@ static void player_command_random(void) {
 
 void player_executeCommand(Command_t command) {
     switch(command) {
-        case Command_Stop:
-            player_command_stop();
+        case Command_Pause:
+            player_command_pause();
             break;
         case Command_Play:
             player_command_play();

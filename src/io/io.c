@@ -2,7 +2,7 @@
 #include <string.h>
 #include "io.h"
 
-IO_Pin_t g_io_stopButton = {
+IO_Pin_t g_io_pauseButton = {
     .id = 1
 };
 
@@ -30,33 +30,33 @@ IO_Pin_t g_io_randomButton = {
     .id = 7
 };
 
-static const char * g_stopCommandString = "stop";
-static const char * g_stopPlayString = "play";
-static const char * g_stopNextString = "next";
-static const char * g_stopPrevString = "prev";
-static const char * g_stopVolupString = "volup";
-static const char * g_stopVoldownString = "voldown";
-static const char * g_stopRandomString = "random";
+static const char * g_pauseCommandString = "pause";
+static const char * g_PlayCommandString = "play";
+static const char * g_NextCommandString = "next";
+static const char * g_PrevCommandString = "prev";
+static const char * g_VolupCommandString = "volup";
+static const char * g_VoldownCommandString = "voldown";
+static const char * g_RandomCommandString = "random";
 
 static void io_processInput(char * commandString) {
-    if(strcmp(commandString, g_stopCommandString) == 0) io_setPinState(&g_io_stopButton, true);
-    else if(strcmp(commandString, g_stopPlayString) == 0) io_setPinState(&g_io_playButton, true);
-    else if(strcmp(commandString, g_stopNextString) == 0) io_setPinState(&g_io_nextButton, true);
-    else if(strcmp(commandString, g_stopPrevString) == 0) io_setPinState(&g_io_prevButton, true);
-    else if(strcmp(commandString, g_stopVolupString) == 0) io_setPinState(&g_io_volUpButton, true);
-    else if(strcmp(commandString, g_stopVoldownString) == 0) io_setPinState(&g_io_volDownButton, true);
-    else if(strcmp(commandString, g_stopRandomString) == 0) io_setPinState(&g_io_randomButton, true);
+    if(strcmp(commandString, g_pauseCommandString) == 0) io_setPinState(&g_io_pauseButton, true);
+    else if(strcmp(commandString, g_PlayCommandString) == 0) io_setPinState(&g_io_playButton, true);
+    else if(strcmp(commandString, g_NextCommandString) == 0) io_setPinState(&g_io_nextButton, true);
+    else if(strcmp(commandString, g_PrevCommandString) == 0) io_setPinState(&g_io_prevButton, true);
+    else if(strcmp(commandString, g_VolupCommandString) == 0) io_setPinState(&g_io_volUpButton, true);
+    else if(strcmp(commandString, g_VoldownCommandString) == 0) io_setPinState(&g_io_volDownButton, true);
+    else if(strcmp(commandString, g_RandomCommandString) == 0) io_setPinState(&g_io_randomButton, true);
 }
 
 void io_init(void) {
     printf("Commands:\n");
-    printf("    * %s\n", g_stopCommandString);
-    printf("    * %s\n", g_stopPlayString);
-    printf("    * %s\n", g_stopNextString);
-    printf("    * %s\n", g_stopPrevString);
-    printf("    * %s\n", g_stopVolupString);
-    printf("    * %s\n", g_stopVoldownString);
-    printf("    * %s\n", g_stopRandomString);
+    printf("    * %s\n", g_pauseCommandString);
+    printf("    * %s\n", g_PlayCommandString);
+    printf("    * %s\n", g_NextCommandString);
+    printf("    * %s\n", g_PrevCommandString);
+    printf("    * %s\n", g_VolupCommandString);
+    printf("    * %s\n", g_VoldownCommandString);
+    printf("    * %s\n", g_RandomCommandString);
 }
 
 bool io_isInterrupted(void) {
@@ -76,5 +76,4 @@ IO_PinState_t io_getPinState(IO_Pin_t * pin) {
 
 void io_setPinState(IO_Pin_t * pin, IO_PinState_t state) {
     pin->received = state;
-    printf("Pin %d set %s\n", pin->id, state ? "HIGH":"LOW");
 }

@@ -158,7 +158,7 @@ static void api_sendRequest(char * url, HTTPRequestType_t type) {
     curl_easy_cleanup(curl);
 }
 
-static void api_sendStopRequest(void) {
+static void api_sendPauseRequest(void) {
     api_sendRequest(API_URL_PAUSE, HTTPRequestType_PUT);
 }
 
@@ -194,8 +194,8 @@ void api_initRequest(ApiRequest_t * request) {
 
 void api_makeRequest(ApiRequest_t * request) {
     switch(request->type) {
-        case RequestType_Stop:
-            api_sendStopRequest();
+        case RequestType_Pause:
+            api_sendPauseRequest();
             break;
 
         case RequestType_Play:

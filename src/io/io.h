@@ -14,7 +14,7 @@ typedef struct {
     bool received;
 }IO_Pin_t;
 
-extern IO_Pin_t g_io_stopButton;
+extern IO_Pin_t g_io_pauseButton;
 extern IO_Pin_t g_io_playButton;
 extern IO_Pin_t g_io_nextButton;
 extern IO_Pin_t g_io_prevButton;
