@@ -4,8 +4,10 @@
             "name": "Project",
             "includePath": [
                 "${workspaceFolder}/**",
-                "${workspaceFolder}/src/application",
-                "${workspaceFolder}/src/io"
+                "${workspaceFolder}/app/include",
+                "${workspaceFolder}/desktop_platform/include",
+                "${workspaceFolder}/desktop_platform/libs/parson/include",
+
             ],
             "defines": [],
             "cStandard": "c17",

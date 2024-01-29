@@ -129,9 +129,7 @@ static void renewToken() {
     }
 }
 
-void api_init(void) {
-    renewToken();
-}
+
 
 static void api_sendRequest(char * url, HTTPRequestType_t type) {
     // Variable declaration
@@ -186,10 +184,14 @@ static void api_sendRandomRequest(bool randomEnabled) {
     api_sendRequest(url, HTTPRequestType_PUT);
 }
 
-void api_initRequest(ApiRequest_t * request) {
+static void api_initRequest(ApiRequest_t * request) {
     request->type = RequestType_Undefined;
     request->volumePercent = 0;
     request->randomEnabled = false;
+}
+
+void api_init(void) {
+    renewToken();
 }
 
 void api_makeRequest(ApiRequest_t * request) {
