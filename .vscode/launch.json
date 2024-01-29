@@ -1,12 +1,11 @@
 {
     "version": "0.2.0",
     "configurations": [
-
         {
             "name": "(gdb) Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/SpotifyApi",
+            "program": "${workspaceFolder}/build/app/App",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceRoot}",

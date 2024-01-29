@@ -11,7 +11,8 @@
         "api.h": "c",
         "cstdlib": "c",
         "type_traits": "c",
-        "stdbool.h": "c"
+        "stdbool.h": "c",
+        "parson.h": "c"
     },
     "cmake.configureOnOpen": false
 }
