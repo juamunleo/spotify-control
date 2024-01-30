@@ -33,8 +33,12 @@ typedef enum {
     HTTPRequestType_POST
 } HTTPRequestType_t;
 
-static char * accessToken;
-static char * refreshToken;
+static char * g_accessToken;
+static char * g_refreshToken;
+
+static bool api_isInitialized(void) {
+    return g_accessToken != NULL;
+}
 
 static void api_initRequestResponse(RequestResponse_t * response) {
     response->len = 0;
@@ -121,10 +125,10 @@ static char * api_getNewToken(void) {
 }
 
 static void renewToken() {
-    free(accessToken);
-    free(refreshToken);
-    accessToken = api_getNewToken();
-    if(accessToken == NULL) {
+    free(g_accessToken);
+    free(g_refreshToken);
+    g_accessToken = api_getNewToken();
+    if(g_accessToken == NULL) {
         printf("Error getting new access token\n");
     }
 }
@@ -145,7 +149,7 @@ static void api_sendRequest(char * url, HTTPRequestType_t type) {
     curl_easy_setopt(curl, CURLOPT_URL, url);
     curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, 0L);
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, "");
-    snprintf(authHeader, sizeof(authHeader), "Authorization: Bearer %s", accessToken);
+    snprintf(authHeader, sizeof(authHeader), "Authorization: Bearer %s", g_accessToken);
     list = curl_slist_append(list, authHeader);
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, list);
     //curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L); // Uncomment if request debug is needed
@@ -184,24 +188,17 @@ static void api_sendRandomRequest(bool randomEnabled) {
     api_sendRequest(url, HTTPRequestType_PUT);
 }
 
-static void api_initRequest(ApiRequest_t * request) {
-    request->type = RequestType_Undefined;
-    request->volumePercent = 0;
-    request->randomEnabled = false;
-}
-
 void api_init(void) {
-    renewToken();
+    if((strlen(BASIC_AUTHORIZATION_BASE64) > 0) && (strlen(REFRESH_TOKEN) > 0)) renewToken();
 }
 
 void api_makeRequest(ApiRequest_t * request) {
+    if(!api_isInitialized()) return;
+    
     switch(request->type) {
-        case RequestType_Pause:
-            api_sendPauseRequest();
-            break;
-
-        case RequestType_Play:
-            api_sendPlayRequest();
+        case RequestType_PlayPause:
+            if(request->playEnabled) api_sendPlayRequest();
+            else api_sendPauseRequest();
             break;
 
         case RequestType_Next:

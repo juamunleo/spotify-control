@@ -3,73 +3,78 @@
 #include "player.h"
 #include "api.h"
 
+#define PLAYER_VOLUME_STEP 5
+
+typedef struct {
+    bool playing;
+    uint8_t volumePercent;
+    bool randomEnabled;
+} PlayerState_t;
+
 static PlayerState_t g_playerState;
 
 void player_init(void) {
+    api_init();
     g_playerState.playing = false;
     g_playerState.volumePercent = 50;
-    g_playerState.randomEnabled = true;
+    g_playerState.randomEnabled = false;
 }
 
 bool player_isPlaying(void) {
     return g_playerState.playing;
 }
 
-bool player_isRandomEnabled(void) {
-    return g_playerState.randomEnabled;
+static void player_setPlaying(bool playing) {
+    g_playerState.playing = playing;
 }
 
 uint8_t player_getVolume(void) {
     return g_playerState.volumePercent;
 }
 
-void player_updateVolume(int8_t volumeIncrease) {
-    if((volumeIncrease > 100) || (volumeIncrease < -100)) return;
-    if((volumeIncrease > 0) && (g_playerState.volumePercent == 100)) return;
-    if((volumeIncrease < 0) && (g_playerState.volumePercent == 0)) return;
+static void player_setVolume(uint8_t newVolume) {
+    if(newVolume > 100) newVolume = 100;
     
-    g_playerState.volumePercent += volumeIncrease;
-
-    if(g_playerState.volumePercent > 100 && volumeIncrease > 0) g_playerState.volumePercent = 100;
-
-    // Note: it's compared to 100 because uint8_t can't be negative. If the volume is reduced below 0, it underflows to 255.
-    if(g_playerState.volumePercent > 100 && volumeIncrease < 0) g_playerState.volumePercent = 0;
+    g_playerState.volumePercent = newVolume;
 }
 
-void player_updateRandomEnabled(bool enabled) {
+bool player_isRandomEnabled(void) {
+    return g_playerState.randomEnabled;
+}
+
+static void player_setRandomEnabled(bool enabled) {
     g_playerState.randomEnabled = enabled;
 }
 
-static void player_command_pause(void) {
+
+
+void player_togglePlay(void) {
+    player_setPlaying(!player_isPlaying());
     ApiRequest_t request = {
-        .type = RequestType_Pause
+        .type = RequestType_PlayPause,
+        .playEnabled = player_isPlaying()
     };
     api_makeRequest(&request);
 }
 
-static void player_command_play(void) {
-    ApiRequest_t request = {
-        .type = RequestType_Play
-    };
-    api_makeRequest(&request);
-}
-
-static void player_command_next(void) {
+void player_next(void) {
     ApiRequest_t request = {
         .type = RequestType_Next
     };
     api_makeRequest(&request);
 }
 
-static void player_command_prev(void) {
+void player_prev(void) {
     ApiRequest_t request = {
         .type = RequestType_Prev
     };
     api_makeRequest(&request);
 }
 
-static void player_command_volup(void) {
-    player_updateVolume(10);
+void player_volUp(void) {
+    uint8_t newVolume = player_getVolume()+PLAYER_VOLUME_STEP;
+    if(newVolume > 100) newVolume = 100;
+    player_setVolume(newVolume);
     ApiRequest_t request = {
         .type = RequestType_Vol,
         .volumePercent = player_getVolume()
@@ -77,8 +82,10 @@ static void player_command_volup(void) {
     api_makeRequest(&request);
 }
 
-static void player_command_voldown(void) {
-    player_updateVolume(-10);
+void player_volDown(void) {
+    int8_t newVolume = player_getVolume()-PLAYER_VOLUME_STEP;
+    if(newVolume < 0) newVolume = 0;
+    player_setVolume(newVolume);
     ApiRequest_t request = {
         .type = RequestType_Vol,
         .volumePercent = player_getVolume()
@@ -86,42 +93,20 @@ static void player_command_voldown(void) {
     api_makeRequest(&request);
 }
 
-static void player_command_random(void) {
-    player_updateRandomEnabled(!player_isRandomEnabled());
+void player_vol(uint8_t newVolume) {
+    player_setVolume(newVolume);
+    ApiRequest_t request = {
+        .type = RequestType_Vol,
+        .volumePercent = player_getVolume()
+    };
+    api_makeRequest(&request);
+}
+
+void player_toggleRandom(void) {
+    player_setRandomEnabled(!player_isRandomEnabled());
     ApiRequest_t request = {
         .type = RequestType_Random,
         .randomEnabled = player_isRandomEnabled()
     };
     api_makeRequest(&request);
-}
-
-
-void player_executeCommand(Command_t command) {
-    switch(command) {
-        case Command_Pause:
-            player_command_pause();
-            break;
-        case Command_Play:
-            player_command_play();
-            break;
-        case Command_Next:
-            player_command_next();
-            break;
-        case Command_Prev:
-            player_command_prev();
-            break;
-        case Command_VolUp:
-            player_command_volup();
-            break;
-        case Command_VolDown:
-            player_command_voldown();
-            break;
-        case Command_Random:
-            player_command_random();
-            break;
-
-        default:
-            break;
-    }
-
 }

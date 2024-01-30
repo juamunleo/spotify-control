@@ -12,7 +12,9 @@
         "cstdlib": "c",
         "type_traits": "c",
         "stdbool.h": "c",
-        "parson.h": "c"
+        "parson.h": "c",
+        "gtest.h": "c",
+        "unity.h": "c"
     },
     "cmake.configureOnOpen": false
 }
