@@ -29,7 +29,7 @@ if(NOT DEFINED READ_ENV_FILE)
     set(READ_ENV_FILE TRUE)
 endif()
 
-if(READ_ENV_FILE)
+if(NOT DEFINED TEST AND READ_ENV_FILE)
     file(STRINGS ../.env ENV_FILE)
     
     # Lines 0 and 1 of the .env file are ignored. They are not useful in the build process.

@@ -1,12 +1,11 @@
-#ifndef SRC_API_API_H
-#define SRC_API_API_H
+#ifndef DESKTOP_PLATFORM_INCLUDE_API_H
+#define DESKTOP_PLATFORM_INCLUDE_API_H
 
 #include <stdint.h>
 #include <stdbool.h>
 
 typedef enum {
-    RequestType_Pause,
-    RequestType_Play,
+    RequestType_PlayPause,
     RequestType_Next,
     RequestType_Prev,
     RequestType_Vol,
@@ -18,6 +17,7 @@ typedef struct {
     RequestType_t type;
     uint8_t volumePercent;
     bool randomEnabled;
+    bool playEnabled;
 } ApiRequest_t;
 
 void api_init(void);
