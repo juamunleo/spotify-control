@@ -1,6 +1,14 @@
 # Spotify API Tests in C
 
 ## Dev container
+### Build the image
+Assuming you are in the project root folder:
+```
+cd docker
+```
+```
+docker build -t c_devcontainer . --no-cache
+```
 ### Start the container
 ```
 docker compose up -d
