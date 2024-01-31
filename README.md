@@ -1,4 +1,4 @@
-# Spotify API Tests in C
+# Spotify Player Control
 
 ## Dev container
 ### Build the image
