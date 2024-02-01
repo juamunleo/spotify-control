@@ -9,7 +9,7 @@
         {
             "label": "Configure CMake project for debug",
             "type": "shell",
-            "command": "cmake -S . -B ./build -DCMAKE_BUILD_TYPE=Debug -DDESKTOP=ON",
+            "command": "cmake -S . -B ./build -DCMAKE_BUILD_TYPE=Debug -DDESKTOP=ON -DREAD_ENV_FILE=TRUE",
             "dependsOn": "Clean CMake project"
         },
         {

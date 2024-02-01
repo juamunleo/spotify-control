@@ -19,7 +19,7 @@ jobs:
         sudo apt install -y libcurl4-openssl-dev
 
     - name: Configure CMake project for release
-      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DDESKTOP=ON
+      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DDESKTOP=ON -DBASIC_AUTHORIZATION_BASE64=${{secrets.BASIC_AUTHORIZATION_BASE64}} -DREFRESH_TOKEN=${{secrets.REFRESH_TOKEN}} 
 
     - name: Build CMake project
       # Build your program with the given configuration
