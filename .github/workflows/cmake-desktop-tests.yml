@@ -1,0 +1,31 @@
+name: C/C++ CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
+    - name: Configure CMake project for testing
+      run: |
+        cmake -S . -B ./build -DCMAKE_BUILD_TYPE=Release -DDESKTOP=ON -DTEST=ON
+
+    - name: Build CMake project for testing
+      run: |
+        cmake --build ./build
+
+    - name: Execute tests
+      run: |
+        cd ./build
+        ctest --verbose
