@@ -31,3 +31,22 @@ jobs:
         name: SpotiyControl-Linux
         path: ${{github.workspace}}/build/app/App
         if-no-files-found: error
+
+  build-mac:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+  
+      - name: Configure CMake project for release
+        run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DDESKTOP=ON -DBASIC_AUTHORIZATION_BASE64=${{secrets.BASIC_AUTHORIZATION_BASE64}} -DREFRESH_TOKEN=${{secrets.REFRESH_TOKEN}} 
+  
+      - name: Build CMake project
+        # Build your program with the given configuration
+        run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+      
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4.3.0
+        with:
+          name: SpotifyControl-MacOS
+          path: ${{github.workspace}}/build/app/App
+          if-no-files-found: error
