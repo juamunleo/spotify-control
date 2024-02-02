@@ -57,7 +57,7 @@ jobs:
         GITHUB_TOKEN: ${{ github.token }}
       with:
         upload_url: ${{ needs.create-release.outputs.upload_url }}
-        asset_path: ./${{ env.ArtifactName }}-Linux
+        asset_path: ${{ github.workspace }}/build/app/App
         asset_name: ${{ env.ArtifactName }}-Linux-Release-${{ github.ref }}.zip
         asset_content_type: application/zip
 
@@ -88,6 +88,6 @@ jobs:
 
         with:
           upload_url: ${{ needs.create-release.outputs.upload_url }}
-          asset_path: ./${{ env.ArtifactName }}-MacOS
+          asset_path: ${{ github.workspace }}/build/app/App
           asset_name: ${{ env.ArtifactName }}-MacOS-Release-${{ github.ref }}.zip
           asset_content_type: application/zip
