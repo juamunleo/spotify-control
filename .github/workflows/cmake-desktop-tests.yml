@@ -1,4 +1,4 @@
-name: C/C++ CI
+name: Application Test
 
 on:
   push:
@@ -6,16 +6,15 @@ on:
   pull_request:
     branches: [ "main" ]
 
+env:
+  BUILD_TYPE: Release
+
 jobs:
-  build:
-
+  test:
     runs-on: ubuntu-latest
-
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
 
     - name: Install dependencies
       run: |
@@ -23,13 +22,13 @@ jobs:
 
     - name: Configure CMake project for testing
       run: |
-        cmake -S . -B ./build -DCMAKE_BUILD_TYPE=Release -DDESKTOP=ON -DTEST=ON
+        cmake -B ${{ github.workspace }}/build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DDESKTOP=ON -DTEST=ON
 
     - name: Build CMake project for testing
       run: |
-        cmake --build ./build
+        cmake --build ${{ github.workspace }}/build --config ${{ env.BUILD_TYPE }}
 
     - name: Execute tests
+      working-directory: ${{ github.workspace }}/build
       run: |
-        cd ./build
         ctest --verbose
