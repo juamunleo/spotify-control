@@ -58,8 +58,8 @@ jobs:
       with:
         upload_url: ${{ needs.create-release.outputs.upload_url }}
         asset_path: ${{ github.workspace }}/build/app/App
-        asset_name: ${{ env.ArtifactName }}-Linux-Release-${{ github.ref }}.zip
-        asset_content_type: application/zip
+        asset_name: ${{ env.ArtifactName }}-Linux-Release-${{ github.ref }}
+        asset_content_type: application/octet-stream
 
   build-mac:
     runs-on: macos-latest
@@ -81,7 +81,7 @@ jobs:
           path: ${{ github.workspace }}/build/app/App
           if-no-files-found: error
 
-      - name: upload windows artifact
+      - name: Upload MacOS artifact to release
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ github.token }}
@@ -89,5 +89,5 @@ jobs:
         with:
           upload_url: ${{ needs.create-release.outputs.upload_url }}
           asset_path: ${{ github.workspace }}/build/app/App
-          asset_name: ${{ env.ArtifactName }}-MacOS-Release-${{ github.ref }}.zip
-          asset_content_type: application/zip
+          asset_name: ${{ env.ArtifactName }}-MacOS-Release-${{ github.ref }}
+          asset_content_type: application/octet-stream
