@@ -8,7 +8,7 @@ env:
   BUILD_TYPE: Release
 
 jobs:
-  build:
+  build-ubuntu:
     runs-on: ubuntu-latest
 
     steps:
@@ -28,6 +28,6 @@ jobs:
     - name: Upload Artifact
       uses: actions/upload-artifact@v4.3.0
       with:
-        name: App
-        path: ${{github.workspace}}/build/app
+        name: SpotiyControl-Linux
+        path: ${{github.workspace}}/build/app/App
         if-no-files-found: error
