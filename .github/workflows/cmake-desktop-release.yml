@@ -1,15 +1,35 @@
 name: C/C++ Release build
 
 on:
-  pull_request:
-    branches: [ "main" ]
+  push:
+    tags:
+      - 'v*'
 
 env:
   BUILD_TYPE: Release
+  ArtifactName: SpotifyControl
 
 jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+      
+    steps:
+    - name: create-release
+      uses: actions/create-release@v1
+      id: create_release
+      with:
+        draft: false
+        prerelease: false
+        release_name: ${{ github.ref }}
+        tag_name: ${{ github.ref }}
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+
   build-ubuntu:
     runs-on: ubuntu-latest
+    needs: create-release
 
     steps:
     - uses: actions/checkout@v3
@@ -19,34 +39,55 @@ jobs:
         sudo apt install -y libcurl4-openssl-dev
 
     - name: Configure CMake project for release
-      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DDESKTOP=ON -DBASIC_AUTHORIZATION_BASE64=${{secrets.BASIC_AUTHORIZATION_BASE64}} -DREFRESH_TOKEN=${{secrets.REFRESH_TOKEN}} 
+      run: cmake -B ${{ github.workspace }}/build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DDESKTOP=ON -DBASIC_AUTHORIZATION_BASE64=${{ secrets.BASIC_AUTHORIZATION_BASE64 }} -DREFRESH_TOKEN=${{ secrets.REFRESH_TOKEN }} 
 
     - name: Build CMake project
-      # Build your program with the given configuration
-      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+      run: cmake --build ${{ github.workspace }}/build --config ${{ env.BUILD_TYPE }}
     
     - name: Upload Artifact
       uses: actions/upload-artifact@v4.3.0
       with:
-        name: SpotiyControl-Linux
-        path: ${{github.workspace}}/build/app/App
+        name: ${{ env.ArtifactName }}-Linux
+        path: ${{ github.workspace }}/build/app/App
         if-no-files-found: error
+
+    - name: Upload Linux artifact to release
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+      with:
+        upload_url: ${{ needs.create-release.outputs.upload_url }}
+        asset_path: ./${{ env.ArtifactName }}-Linux
+        asset_name: ${{ env.ArtifactName }}-Linux-Release-x86-${{ github.ref }}.zip
+        asset_content_type: application/zip
 
   build-mac:
     runs-on: macos-latest
+    needs: create-release
+    
     steps:
       - uses: actions/checkout@v3
   
       - name: Configure CMake project for release
-        run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DDESKTOP=ON -DBASIC_AUTHORIZATION_BASE64=${{secrets.BASIC_AUTHORIZATION_BASE64}} -DREFRESH_TOKEN=${{secrets.REFRESH_TOKEN}} 
+        run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DDESKTOP=ON -DBASIC_AUTHORIZATION_BASE64=${{ secrets.BASIC_AUTHORIZATION_BASE64 }} -DREFRESH_TOKEN=${{ secrets.REFRESH_TOKEN }} 
   
       - name: Build CMake project
-        # Build your program with the given configuration
-        run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+        run: cmake --build ${{ github.workspace }}/build --config ${{ env.BUILD_TYPE }}
       
       - name: Upload Artifact
         uses: actions/upload-artifact@v4.3.0
         with:
-          name: SpotifyControl-MacOS
-          path: ${{github.workspace}}/build/app/App
+          name: ${{ env.ArtifactName }}-MacOS
+          path: ${{ github.workspace }}/build/app/App
           if-no-files-found: error
+
+      - name: upload windows artifact
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
+        with:
+          upload_url: ${{ needs.create-release.outputs.upload_url }}
+          asset_path: ./bin/azblogfilter.windows-amd64.zip
+          asset_name: azblogfilter.windows-amd64.zip
+          asset_content_type: application/zip
