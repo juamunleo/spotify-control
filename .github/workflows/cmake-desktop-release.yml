@@ -26,6 +26,10 @@ jobs:
         tag_name: ${{ github.ref }}
       env:
         GITHUB_TOKEN: ${{ github.token }}
+    
+    - name: Set version in environment variables
+      run: |
+        echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
 
   build-ubuntu:
     runs-on: ubuntu-latest
@@ -58,7 +62,7 @@ jobs:
       with:
         upload_url: ${{ needs.create-release.outputs.upload_url }}
         asset_path: ${{ github.workspace }}/build/app/App
-        asset_name: ${{ env.ArtifactName }}-Linux-Release-${{ github.ref }}
+        asset_name: ${{ env.ArtifactName }}-Linux-Release-${{ env.RELEASE_VERSION }}
         asset_content_type: application/octet-stream
 
   build-mac:
@@ -89,5 +93,5 @@ jobs:
         with:
           upload_url: ${{ needs.create-release.outputs.upload_url }}
           asset_path: ${{ github.workspace }}/build/app/App
-          asset_name: ${{ env.ArtifactName }}-MacOS-Release-${{ github.ref }}
+          asset_name: ${{ env.ArtifactName }}-MacOS-Release-${{ env.RELEASE_VERSION }}
           asset_content_type: application/octet-stream
