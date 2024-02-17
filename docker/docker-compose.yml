@@ -1,4 +1,4 @@
-version: "2.1"
+version: '3'
 services:
   code-server:
     image: c_devcontainer
@@ -6,3 +6,4 @@ services:
     volumes:
       - ../:/work
     restart: unless-stopped
+    tty: true

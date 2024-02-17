@@ -1,11 +1,8 @@
-FROM lscr.io/linuxserver/code-server:4.20.0
-WORKDIR /work
-ENV PUID=1000
-ENV PGID=1000
-ENV TZ=Etc/UTC
-ENV PASSWORD=password
-ENV SUDO_PASSWORD=password
-ENV DEFAULT_WORKSPACE=/work
-RUN sudo apt update
-RUN sudo apt install -y build-essential gdb cmake python3 python3-pip
-RUN sudo pip install flask requests
+FROM ubuntu:24.04
+WORKDIR /toolchain
+RUN apt update
+RUN apt install -y build-essential gdb cmake python3 python3-pip python3-flask python3-requests git wget flex bison gperf python3-venv ninja-build ccache libffi-dev libssl-dev dfu-util libusb-1.0-0
+RUN git clone --recursive https://github.com/espressif/esp-idf.git
+WORKDIR /toolchain/esp-idf
+RUN ./install.sh esp32
+RUN . ./export.sh
