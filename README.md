@@ -1,24 +1,5 @@
 # Spotify Player Control
 
-## Dev container
-### Build the image
-Assuming you are in the project root folder:
-```
-cd docker
-```
-```
-docker build -t c_devcontainer . --no-cache
-```
-### Start the container
-```
-docker compose up -d
-```
-
-### Connect to the container
-Using vscode remote containers
-
-<br><br>
-
 ## Configure the project
 ### .env file
 Read .env.template to create your own .env file in order to build the application.
@@ -34,3 +15,14 @@ Start the python server to get spotify tokens (must be in the project root folde
 ```
 python3 scripts/authorization.py
 ``` 
+
+## Build the project
+### Desktop platform
+```
+rm -rf ./build && cmake -S . -B ./build -DCMAKE_BUILD_TYPE=Debug -DDESKTOP=ON -DREAD_ENV_FILE=TRUE && cmake --build ./build
+```
+
+### Embedded platform
+```
+rm -rf ./build && cmake -S . -B ./build -DCMAKE_TOOLCHAIN_FILE=toolchain.cmake -DEMBEDDED=ON -DREAD_ENV_FILE=TRUE && cmake --build ./build
+```
