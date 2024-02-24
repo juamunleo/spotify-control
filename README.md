@@ -16,7 +16,13 @@ Start the python server to get spotify tokens (must be in the project root folde
 python3 scripts/authorization.py
 ``` 
 
-### Build embedded
+## Build the project
+### Desktop platform
+```
+rm -rf ./build && cmake -S . -B ./build -DCMAKE_BUILD_TYPE=Debug -DDESKTOP=ON -DREAD_ENV_FILE=TRUE && cmake --build ./build
+```
+
+### Embedded platform
 ```
 rm -rf ./build && cmake -S . -B ./build -DCMAKE_TOOLCHAIN_FILE=toolchain.cmake -DEMBEDDED=ON -DREAD_ENV_FILE=TRUE && cmake --build ./build
 ```
