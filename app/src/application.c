@@ -9,8 +9,6 @@ void app_setup(void) {
 }
 
 void app_loop(void) {
-    if(!io_isInterrupted()) return;
-
     if(io_getPinState(&g_io_playPauseButton)) player_togglePlay();
     else if(io_getPinState(&g_io_nextButton)) player_next();
     else if(io_getPinState(&g_io_prevButton)) player_prev();

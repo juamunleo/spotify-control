@@ -7,17 +7,30 @@
             "command": "rm -rf ./build",
         },
         {
-            "label": "Configure CMake project for debug",
+            "label": "Configure CMake project for desktop debug",
             "type": "shell",
             "command": "cmake -S . -B ./build -DCMAKE_BUILD_TYPE=Debug -DDESKTOP=ON -DREAD_ENV_FILE=TRUE",
             "dependsOn": "Clean CMake project"
         },
         {
-            "label": "Build CMake project for debug",
+            "label": "Configure CMake project for embedded debug",
+            "type": "shell",
+            "command": "cmake -S . -B ./build -DCMAKE_TOOLCHAIN_FILE=toolchain.cmake -DCMAKE_BUILD_TYPE=Debug -DEMBEDDED=ON -DREAD_ENV_FILE=TRUE",
+            "dependsOn": "Clean CMake project"
+        },
+        {
+            "label": "Build CMake desktop project",
             "type": "shell",
             "command": "cmake --build ./build",
             "group": "build",
-            "dependsOn": "Configure CMake project for debug"
+            "dependsOn": "Configure CMake project for desktop debug"
         },
+        {
+            "label": "Build CMake embedded project",
+            "type": "shell",
+            "command": "cmake --build ./build",
+            "group": "build",
+            "dependsOn": "Configure CMake project for embedded debug"
+        }
     ]
 }

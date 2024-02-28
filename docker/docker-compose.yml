@@ -1,9 +1,0 @@
-version: '3'
-services:
-  code-server:
-    image: c_devcontainer
-    container_name: spotify_api_c_devcontainer
-    volumes:
-      - ../:/work
-    restart: unless-stopped
-    tty: true

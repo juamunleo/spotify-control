@@ -2,7 +2,28 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "(gdb) Launch",
+            "name": "Embedded debug",
+            "cwd": "${workspaceFolder}",
+            "executable": "${workspaceFolder}/build/app/App",
+            "request": "launch",
+            "type": "cortex-debug",
+            "runToEntryPoint": "main",
+            "showDevDebugOutput": "vscode",
+            "servertype": "external",
+            "gdbTarget": "host.docker.internal:61234",
+            "preLaunchTask": "Build CMake embedded project",
+            "toolchainPrefix": "/toolchain/gnu-arm/bin/arm-none-eabi",
+            "overrideLaunchCommands": [
+                "monitor reset",
+                "-target-download",
+                "monitor reset"
+            ],
+            "overrideRestartCommands": [
+                "monitor reset"
+            ],
+        },
+        {
+            "name": "Desktop debug",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build/app/App",
@@ -13,7 +34,7 @@
             "externalConsole": false,
             "MIMode": "gdb",
             "miDebuggerPath": "/usr/bin/gdb",
-            "preLaunchTask": "Build CMake project for debug",
+            "preLaunchTask": "Build CMake desktop project",
             "setupCommands": [
                 {
                     "description": "Enable pretty-printing for gdb",

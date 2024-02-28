@@ -5,14 +5,15 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "${workspaceFolder}/app/include",
+                "${workspaceFolder}/embedded_platform/include",
                 "${workspaceFolder}/desktop_platform/include",
                 "${workspaceFolder}/desktop_platform/libs/parson/include",
                 "${workspaceFolder}/libs/unity/include",
                 "${workspaceFolder}/app/src"
             ],
             "defines": [],
-            "cStandard": "c17",
-            "cppStandard": "c++17"
+            "cStandard": "c11",
+            "cppStandard": "c++11"
         }
     ],
     "version": 4
