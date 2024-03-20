@@ -20,18 +20,15 @@ set (PROJECT_SOURCES
 	src/sysmem.c
     src/io.c
     src/api.c
-    Drivers/src/stm32f411xx_gpio.c
 )
 
 set (PROJECT_INCLUDES
     include/
 )
-set (DRIVERS_INCLUDES
-    Drivers/Inc/
-)
 
 project(EmbeddedPlatform)
 enable_language(ASM)
+add_subdirectory(stm32)
 
 add_library(
     ${PROJECT_NAME}
@@ -42,7 +39,14 @@ target_include_directories(
     ${PROJECT_NAME}
     PUBLIC
     ${PROJECT_INCLUDES}
-    ${DRIVERS_INCLUDES}
+)
+
+target_link_libraries(
+    ${PROJECT_NAME}
+    PUBLIC
+    STM32DEVICE
+    STM32CORE
+    STM32HAL
 )
 
 if(NOT DEFINED READ_ENV_FILE)

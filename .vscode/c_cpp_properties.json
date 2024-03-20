@@ -9,9 +9,14 @@
                 "${workspaceFolder}/desktop_platform/include",
                 "${workspaceFolder}/desktop_platform/libs/parson/include",
                 "${workspaceFolder}/libs/unity/include",
-                "${workspaceFolder}/app/src"
+                "${workspaceFolder}/app/src",
+                "${workspaceFolder}/embedded_platform/stm32/hal/include",
+                "${workspaceFolder}/embedded_platform/stm32/device/include",
+                "${workspaceFolder}/embedded_platform/stm32/core/include",
             ],
-            "defines": [],
+            "defines": [
+                "STM32F411xE"
+            ],
             "cStandard": "c11",
             "cppStandard": "c++11"
         }

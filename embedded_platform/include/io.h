@@ -3,14 +3,17 @@
 
 #include <stdint.h>
 #include <stdbool.h>
-#include "stm32f411xx_gpio.h"
+#include "stm32f4xx_hal_gpio.h"
 
 typedef enum {
     IO_PinState_Low,
     IO_PinState_High
 } IO_PinState_t;
 
-typedef GPIO_Handle_t IO_Pin_t;
+typedef struct {
+    GPIO_TypeDef * pGPIOx;
+    GPIO_InitTypeDef GPIO_config;
+} IO_Pin_t;
 
 extern IO_Pin_t g_io_playPauseButton;
 extern IO_Pin_t g_io_nextButton;
